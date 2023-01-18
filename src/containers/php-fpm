@@ -12,6 +12,21 @@ RUN useradd ${CALLING_USER} -u ${CALLING_UID}
 RUN mkdir -p /run/php-fpm
 RUN chown ${CALLING_USER} /run/php-fpm
 RUN chown ${CALLING_USER} /var/log/php*log
-RUN touch /usr/local/etc/msmtprc && chown ${CALLING_USER} $_
+
+# Section start - Fix email sending issues
+RUN chmod a+w /etc/msmtprc
+# Section end
+
+# Section start - Fix "permission denied issue" when executing the "entrypoint.sh" script.
+RUN chmod a+w /etc/php-fpm.d/www.conf
+# Section end
+
+# Section start - Fix nvm installation issues
+# Image "10up/wp-php-fpm-dev:7.4-ubuntu" installs nvm for the "www-data" user so
+# it also needs to be "installed" for the "CALLING_USER".
+RUN mkhomedir_helper ${CALLING_USER}
+RUN cp -a /home/www-data/. /home/${CALLING_USER}
+RUN chown -R ${CALLING_USER}:${CALLING_USER} /home/${CALLING_USER}/.
+# Section end
 
 USER ${CALLING_USER}
