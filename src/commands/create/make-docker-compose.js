@@ -47,6 +47,7 @@ module.exports = function makeDockerCompose( spinner ) {
 					},
 				},
 				phpfpm: {
+					extra_hosts: ['host.docker.internal:host-gateway'],
 					image: images[`php${ phpVersion }`],
 					depends_on: [ 'memcached' ],
 					networks: [ 'default', 'wplocaldocker' ],
